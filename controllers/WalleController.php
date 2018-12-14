@@ -159,10 +159,7 @@ class WalleController extends Controller
         $log = [];
         $code = 0;
 
-        // 本地git ssh-key是否加入deploy-keys列表
-        $revision = Repo::getRevision($project);
         try {
-
             // 1.检测宿主机检出目录是否可读写
             $codeBaseDir = Project::getDeployFromDir();
             $isWritable = is_dir($codeBaseDir) ? is_writable($codeBaseDir) : @mkdir($codeBaseDir, 0755, true);
@@ -175,16 +172,19 @@ class WalleController extends Controller
             }
 
             // 2.检测宿主机ssh是否加入git信任
-            $ret = $revision->updateRepo();
-            if (!$ret) {
-                $code = -1;
-                $error = $project->repo_type == Project::REPO_GIT ? yii::t('walle', 'ssh-key to git',
-                    ['user' => getenv("USER")]) : yii::t('walle', 'correct username passwd');
-                $log[] = yii::t('walle', 'hosted server ssh error', [
-                    'error' => $error,
-                ]);
+            if ($project->repo_type != Project::REPO_FILE) {
+                $revision = Repo::getRevision($project);
+                $ret = $revision->updateRepo();
+                if (!$ret) {
+                    $code = -1;
+                    $error = $project->repo_type == Project::REPO_GIT ? yii::t('walle', 'ssh-key to git',
+                        ['user' => getenv("USER")]) : yii::t('walle', 'correct username passwd');
+                        $log[] = yii::t('walle', 'hosted server ssh error', [
+                            'error' => $error,
+                        ]);
+                }
             }
-
+            
             if ($project->ansible) {
                 $this->ansible = new Ansible($project);
 

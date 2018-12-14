@@ -9,6 +9,7 @@ use app\components\Controller;
 use app\models\Task;
 use app\models\Project;
 use app\models\Group;
+use yii\web\UploadedFile;
 
 class TaskController extends Controller
 {
@@ -121,6 +122,23 @@ class TaskController extends Controller
             }
 
             if ($task->load(\Yii::$app->request->post())) {
+                
+                // File文件
+                if ($conf->repo_type == Project::REPO_FILE) {
+                    $arch_file = UploadedFile::getInstanceByName('task_archive_file');
+                    if (empty($arch_file) || $arch_file->hasError) {
+                        throw new \Exception('文件上传失败');
+                    }
+                    if ( ! in_array($arch_file->extension, ['zip', 'tgz'])){
+                        throw new \Exception('文件格式错误');
+                    }
+                    
+                    $task->file_list = rtrim($conf->deploy_from, '/') . '/archfile_' . $projectId . '_' . $this->uid . '.' . $arch_file->extension;
+                    if ( ! $arch_file->saveAs($task->file_list, true)) {
+                        throw new \Exception('上传文件操作失败');
+                    }
+                }
+                
                 // 是否需要审核
                 $status = $conf->audit == Project::AUDIT_YES ? Task::STATUS_SUBMIT : Task::STATUS_PASS;
                 $task->user_id = $this->uid;
@@ -129,10 +147,17 @@ class TaskController extends Controller
                 if ($task->save()) {
                     return $this->redirect('@web/task/');
                 }
+                @unlink($task->file_list);
             }
         }
-
-        $tpl = $conf->repo_type == Project::REPO_GIT ? 'submit-git' : 'submit-svn';
+        
+        if ($conf->repo_type == Project::REPO_GIT) {
+            $tpl = 'submit-git';
+        } elseif ($conf->repo_type == Project::REPO_SVN) {
+            $tpl = 'submit-svn';
+        } else {
+            $tpl = 'submit-file';
+        }
 
         return $this->render($tpl, [
             'task' => $task,

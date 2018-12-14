@@ -5,6 +5,7 @@
 $this->title = $conf->name . yii::t('conf', 'edit');
 
 use yii\widgets\ActiveForm;
+use app\models\Project;
 ?>
 
 <div class="profile-user-info">
@@ -25,6 +26,15 @@ use yii\widgets\ActiveForm;
         </div>
     </div>
 
+	<?php if ($conf->repo_type == Project::REPO_FILE) { ?>
+    <div class="profile-info-row">
+        <div class="profile-info-name">包格式:</div>
+
+        <div class="profile-info-value">
+            <span>.zip, .tgz</span>
+        </div>
+    </div>
+    <?php } else { ?>
     <div class="profile-info-row">
         <div class="profile-info-name"> <?= yii::t('conf', 'url') ?> </div>
 
@@ -32,6 +42,7 @@ use yii\widgets\ActiveForm;
             <span><?= $conf->repo_url ?></span>
         </div>
     </div>
+    <?php } ?>
 
     <!-- 宿主机 配置-->
     <h4 class="lighter"><i class="icon-dashboard orange"></i><?= yii::t('conf', 'host') ?></h4>

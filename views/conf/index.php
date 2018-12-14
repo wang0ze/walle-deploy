@@ -4,6 +4,7 @@
  */
 $this->title = yii::t('conf', 'index');
 use yii\helpers\Url;
+use app\models\Project;
 ?>
 <div class="box">
     <div class="page-header">
@@ -32,6 +33,7 @@ use yii\helpers\Url;
             <tbody><tr>
                 <th><?= yii::t('conf', 'p_name') ?></th>
                 <th><?= yii::t('conf', 'p_env') ?></th>
+                <th><?= yii::t('conf', 'p_repo') ?></th>
                 <th><?= yii::t('conf', 'p_mode') ?></th>
                 <th><?= yii::t('conf', 'p_audit') ?></th>
                 <th><?= yii::t('conf', 'p_status') ?></th>
@@ -41,7 +43,8 @@ use yii\helpers\Url;
                 <tr>
                     <td><?= $item['name'] ?></td>
                     <td><?= \Yii::t('w', 'conf_level_' . $item['level']) ?></td>
-                    <td><?= $item['repo_mode'] ?></td>
+                    <td><?= ucfirst($item['repo_type']) ?></td>
+                    <td><?= $item['repo_type'] == Project::REPO_FILE ? '--' : $item['repo_mode'] ?></td>
                     <td><?= \Yii::t('w', 'conf_audit_' . $item['audit']) ?></td>
                     <td><?= \Yii::t('w', 'conf_status_' . $item['status']) ?></td>
                     <td class="<?= \Yii::t('w', 'conf_status_' . $item['status'] . '_color') ?>">

@@ -67,6 +67,8 @@ class Project extends \yii\db\ActiveRecord
     const REPO_GIT = 'git';
 
     const REPO_SVN = 'svn';
+    
+    const REPO_FILE = 'file';
 
     public static $CONF;
 
@@ -105,7 +107,7 @@ class Project extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'repo_url', 'name', 'level', 'deploy_from', 'release_user', 'release_to', 'release_library', 'hosts', 'keep_version_num'], 'required'],
+            [['user_id', 'name', 'level', 'deploy_from', 'release_user', 'release_to', 'release_library', 'hosts', 'keep_version_num'], 'required'],
             [['user_id', 'level', 'status', 'post_release_delay', 'audit', 'ansible', 'keep_version_num'], 'integer'],
             [['excludes', 'hosts', 'pre_deploy', 'post_deploy', 'pre_release', 'post_release'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
@@ -188,8 +190,12 @@ class Project extends \yii\db\ActiveRecord
     public static function getDeployWorkspace($version) {
         $from    = static::$CONF->deploy_from;
         $env     = isset(static::$LEVEL[static::$CONF->level]) ? static::$LEVEL[static::$CONF->level] : 'unknow';
-        $project = static::getGitProjectName(static::$CONF->repo_url);
-
+        if (static::$CONF->repo_type == Project::REPO_FILE) {
+            $project = 'archive_files_' . static::$CONF->id;
+        } else {
+            $project = static::getGitProjectName(static::$CONF->repo_url);
+        }
+        
         return sprintf("%s/%s/%s-%s", rtrim($from, '/'), rtrim($env, '/'), $project, $version);
     }
 

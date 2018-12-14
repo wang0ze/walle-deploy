@@ -25,6 +25,7 @@ use yii\widgets\ActiveForm;
             'class'          => 'col-sm-11',])
             ->label(yii::t('conf', 'env'), ['class' => 'text-right bolder blue col-sm-1']) ?>
         <div class="clearfix"></div>
+        
         <?php if (empty($_GET['projectId'])) { ?>
         <div class="widget-box transparent" id="recent-box" style="margin-top:15px">
             <div class="tabbable no-border">
@@ -33,10 +34,12 @@ use yii\widgets\ActiveForm;
                     Repo
                 </h4>
                 <ul class="nav nav-tabs" id="recent-tab">
-                    <li class="active">
+                	<li class="active">
+                        <a data-toggle="tab" class="show-file" href="#repo-tab">File</a>
+                    </li>
+                    <li class="">
                         <a data-toggle="tab" class="show-git" href="#repo-tab">Git</a>
                     </li>
-
                     <li class="">
                         <a data-toggle="tab" class="show-svn" href="#repo-tab">Svn</a>
                     </li>
@@ -45,8 +48,17 @@ use yii\widgets\ActiveForm;
         </div>
         <?php } ?>
 
-        <!-- 地址 配置-->
-        <?= $form->field($conf, 'repo_url')
+		<?php if (empty($_GET['projectId']) || $conf->repo_type == Project::REPO_FILE) { ?>
+		<div class="form-group repo_file_tip required">
+            <label class="text-right bolder blue col-sm-1" >包格式:</label>
+            <input type="text" id="repo_file_tip" class="col-sm-11" name="repo_file_tip" value=".zip, .tgz" disabled>
+            <div class="help-block"></div>
+        </div>
+        <?php } ?>
+        
+        <?php if (empty($_GET['projectId']) || $conf->repo_type != Project::REPO_FILE) {
+            $display = empty($_GET['projectId']) ? 'none' : 'block';
+            echo $form->field($conf, 'repo_url', ['options' => ['style' => 'display:'.$display]])
             ->textInput([
                 'class'          => 'col-sm-11',
                 'placeholder'    => 'git@github.com:meolu/walle-web.git',
@@ -54,25 +66,24 @@ use yii\widgets\ActiveForm;
                 'data-rel'       => 'tooltip',
                 'data-title'     => yii::t('conf', 'repo url tip'),
             ])
-            ->label(yii::t('conf', 'url'), ['class' => 'text-right bolder blue col-sm-1']) ?>
-        <!-- 地址 配置 end-->
+            ->label(yii::t('conf', 'url'), ['class' => 'text-right bolder blue col-sm-1']);
+        }?>
+        
         <div class="clearfix"></div>
         <?php if (empty($_GET['projectId']) || $conf->repo_type == Project::REPO_SVN) { ?>
         <div class="username-password" style="<?= empty($_GET['projectId']) ? 'display:none' : '' ?>">
         <?= $form->field($conf, 'repo_username')
-            ->textInput([
-                'class'          => 'col-sm-3',
-            ])
+            ->textInput(['class' => 'col-sm-3'])
             ->label(yii::t('conf', 'username'), ['class' => 'text-right bolder blue col-sm-1']) ?>
-        <?= $form->field($conf, 'repo_password')
-            ->passwordInput([
-                'class'          => 'col-sm-3',
-            ])
+            
+        <?= $form->field($conf, 'repo_password', ['inputOptions' => ['autocomplete' => 'new-password']])
+            ->passwordInput(['class' => 'col-sm-3'])
             ->label(yii::t('conf', 'password'), ['class' => 'text-right bolder blue col-sm-1']); ?>
         </div>
         <div class="clearfix"></div>
 
         <?php } ?>
+        
         <?= $form->field($conf, 'repo_type')
             ->hiddenInput()
             ->label('') ?>
@@ -262,7 +273,7 @@ use yii\widgets\ActiveForm;
         <!-- 目标机器 配置 end-->
         <div class="hr hr-dotted"></div>
 
-        <div class="form-group">
+        <div class="form-group field-project-repo_mode" style="display:none;">
             <label class="text-right bolder blue">
                 <?= yii::t('conf', 'branch/tag') ?>
             </label>
@@ -329,12 +340,26 @@ use yii\widgets\ActiveForm;
     jQuery(function($) {
         $('[data-rel=tooltip]').tooltip({container:'body'});
         $('[data-rel=popover]').popover({container:'body'});
+        $('.show-file').click(function() {
+        	$('.repo_file_tip').show();
+        	$('.field-project-repo_url').hide();
+        	$('.field-project-repo_mode').hide();
+            $('.username-password').hide();
+            $('#project-repo_type').val('file');
+            $('#div-repo_mode_nontrunk').hide();
+        });
         $('.show-git').click(function() {
+        	$('.repo_file_tip').hide();
+        	$('.field-project-repo_url').show();
+        	$('.field-project-repo_mode').show();
             $('.username-password').hide();
             $('#project-repo_type').val('git');
             $('#div-repo_mode_nontrunk').hide();
         });
         $('.show-svn').click(function() {
+        	$('.repo_file_tip').hide();
+        	$('.field-project-repo_url').show();
+        	$('.field-project-repo_mode').show();
             $('.username-password').show();
             $('#project-repo_type').val('svn');
             $('#div-repo_mode_nontrunk').css({'display': 'inline'});

@@ -25,6 +25,8 @@ class Repo extends Command {
                 return new Git($conf);
             case Project::REPO_SVN:
                 return new Svn($conf);
+            case Project::REPO_FILE;
+                return new Archive($conf);
             default:
                 throw new \Exception(\yii::t('walle', 'unknown scm'));
                 break;

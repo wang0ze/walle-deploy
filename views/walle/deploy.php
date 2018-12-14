@@ -5,6 +5,7 @@
 $this->title = yii::t('walle', 'deploying');
 use \app\models\Task;
 use yii\helpers\Url;
+use app\models\Project;
 ?>
 <style>
     .status > span {
@@ -28,7 +29,9 @@ use yii\helpers\Url;
             <?= $task->project->name ?>
             ：
             <?= $task->title ?>
+            <?php if ($task->project['repo_type'] != Project::REPO_FILE) {?>
             （<?= $task->project->repo_mode . ':' . $task->branch ?> <?= yii::t('walle', 'version') ?><?= $task->commit_id ?>）
+            <?php } ?>
             <?php if (in_array($task->status, [Task::STATUS_PASS, Task::STATUS_FAILED])) { ?>
                 <button type="submit" class="btn btn-primary btn-deploy" data-id="<?= $task->id ?>"><?= yii::t('walle', 'deploy') ?></button>
             <?php } ?>

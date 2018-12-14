@@ -10,7 +10,7 @@ use yii\helpers\Url;
 ?>
 <div class="box">
     <div class="page-header">
-        <form action="/task/" method="POST">
+        <form action="<?= Url::to('@web/task/') ?>" method="POST">
             <input type="hidden" value="<?= \Yii::$app->request->getCsrfToken(); ?>" name="_csrf">
             <div class="col-xs-2 col-sm-2">
                 <div class="form-group">
@@ -69,8 +69,8 @@ use yii\helpers\Url;
 					<?= \Yii::t('w', 'deploy_mode_' . $item['file_transmission_mode']) ?>
 					</td>
                     <td><?= $item['updated_at'] ?></td>
-                    <td><?= $item['branch'] ?></td>
-                    <td><?= $item['commit_id'] ?></td>
+                    <td><?= empty($item['branch']) ? '--' : $item['branch']; ?></td>
+                    <td><?= empty($item['commit_id']) ? '--' : $item['commit_id']; ?></td>
                     <td class="<?= \Yii::t('w', 'task_status_' . $item['status'] . '_color') ?>">
                         <?= \Yii::t('w', 'task_status_' . $item['status']) ?></td>
                     <td>
