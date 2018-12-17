@@ -95,7 +95,7 @@ use yii\helpers\Url;
                                     </a>
                                 <?php } ?>
                                 <!-- 回滚的任务不能再回滚-->
-                                <?php if ($item['status'] == Task::STATUS_DONE && $item['enable_rollback'] == Task::ROLLBACK_TRUE) { ?>
+                                <?php if ($item['status'] == Task::STATUS_DONE && $item['enable_rollback'] == Task::ROLLBACK_TRUE && !empty($item['ex_link_id'])) { ?>
                                     <a href="javascript:;" class="brown task-rollback" data-id="<?= $item['id'] ?>">
                                         <i class="icon-reply bigger-130"></i>
                                         <?= yii::t('task', 'rollback') ?>
